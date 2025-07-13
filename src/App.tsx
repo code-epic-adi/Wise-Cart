@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useRef } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Search, Plus, X, Filter, Sun, Moon, QrCode } from 'lucide-react';
 import { db } from './firebase';
 import { collection, getDocs, doc, getDoc } from 'firebase/firestore';
@@ -845,8 +845,7 @@ const App = () => {
         )}</span>
                         </td>
       {comparisonResults.map((result, idx) => {
-                          const score = result.specScores[spec];
-        const valueDisplay = getSpecValue(result.product, spec);
+                          const valueDisplay = getSpecValue(result.product, spec);
         const isBestOrTie = bestIdxs.includes(idx) && valueDisplay !== 'N/A';
                           return (
           <td key={result.product.id + '-' + spec} className={`py-3 px-4 text-center align-middle ${isBestOrTie ? 'bg-green-100 dark:bg-green-900 font-bold' : ''}`}> 
