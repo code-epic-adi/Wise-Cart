@@ -910,17 +910,15 @@ const App = () => {
                       )}
                     </div>
         )}
-        {/* Add QR scan icon button for mobile/tablet only (md:hidden) */}
         {!showComparison && (
-          <div className="flex justify-end mb-4 z-10 relative">
-                    <button
-              className="p-3 bg-accent text-white rounded-full shadow hover:bg-accent/90 focus:outline-none focus:ring-2 focus:ring-accent"
-              onClick={() => { setQrModalKey(Date.now()); setShowQrModal(true); }}
-              aria-label="Scan QR to Add Product"
-            >
-              <QrCode className="w-7 h-7" />
-                    </button>
-          </div>
+          <button
+            className="fixed bottom-6 right-6 p-4 bg-accent text-white rounded-full shadow-lg hover:bg-accent/90 focus:outline-none focus:ring-2 focus:ring-accent z-50"
+            onClick={() => { setQrModalKey(Date.now()); setShowQrModal(true); }}
+            aria-label="Scan QR to Add Product"
+            style={{ boxShadow: '0 4px 16px rgba(0,0,0,0.18)' }}
+          >
+            <QrCode className="w-7 h-7" />
+          </button>
         )}
         <QrScannerModal
           key={qrModalKey}
