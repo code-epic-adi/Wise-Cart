@@ -4,37 +4,10 @@ import { db } from './firebase';
 import { collection, getDocs, doc, getDoc } from 'firebase/firestore';
 import QrScannerModal from './QrScannerModal';
 
-interface Product {
-  id: string;
-  name: string;
-  brand: string;
-  category: 'smartphones' | 'laptops' | 'home_appliances' | string;
-  price: number | string;
-  specs: Record<string, any>;
-  image?: string;
-  buy?: string;
-}
-
-interface CategoryWeights {
-  [key: string]: number;
-}
-
-const SPEC_KEY_MAP: Record<string, string> = {
-  'Rear-Facing Camera MP': 'camera',
-  'RAM Memory (GB)': 'ram',
-  'Screen Size (inch)': 'screen',
-  'Weight (g)': 'weight',
-  'Resolution (ppi)': 'resolution',
-  'ROM (GB)': 'storage',
-  'Battery Capacity (mAh)': 'battery',
-  'Processor Brand': 'processor',
-  // Add more mappings as needed for your Firestore spec keys
-};
-
 const App = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
-  const [selectedProducts, setSelectedProducts] = useState<Product[]>([]);
+  const [selectedProducts, setSelectedProducts] = useState<any[]>([]);
   const [showComparison, setShowComparison] = useState(false);
   const [comparisonResults, setComparisonResults] = useState<any[]>([]);
   const [isDark, setIsDark] = useState(false);
@@ -42,15 +15,11 @@ const App = () => {
   const [loading, setLoading] = useState(true);
   const [modalProduct, setModalProduct] = useState<any | null>(null);
   const [categoryWeights, setCategoryWeights] = useState<any>(null);
-  const [categoryScoringMap, setCategoryScoringMap] = useState<any>(null);
   const [useCustomWeights, setUseCustomWeights] = useState(false);
   const [customWeights, setCustomWeights] = useState<any>({});
   const [weightError, setWeightError] = useState<string | null>(null);
   const [showQrModal, setShowQrModal] = useState(false);
   const [qrModalKey, setQrModalKey] = useState(Date.now());
-  const [toast, setToast] = useState<{ type: 'success' | 'error' | 'info'; message: string } | null>(null);
-  const qrContainerRef = useRef<HTMLDivElement>(null);
-  const [qrKey, setQrKey] = useState(Date.now());
   const [categoryError, setCategoryError] = useState<string | null>(null);
   // Add a reload trigger
   const [reloadKey, setReloadKey] = useState(0);
@@ -119,13 +88,11 @@ const App = () => {
     if (cached && cacheTime && now - Number(cacheTime) < 3600 * 1000) {
       const data = JSON.parse(cached);
       setCategoryWeights(data.weightage);
-      setCategoryScoringMap(data.scoringMap);
       return data;
     } else {
       const catDoc = await getDoc(doc(db, 'categories', categoryId));
       if (catDoc.exists()) {
         setCategoryWeights(catDoc.data().weightage);
-        setCategoryScoringMap(catDoc.data().scoringMap);
         localStorage.setItem(cacheKey, JSON.stringify(catDoc.data()));
         localStorage.setItem(cacheTimeKey, String(now));
         return catDoc.data();
@@ -144,7 +111,6 @@ const App = () => {
           if (data) {
             // Optionally, tag the weights with the category for quick check
             setCategoryWeights({ ...data.weightage, _category: category });
-            setCategoryScoringMap(data.scoringMap);
           }
         });
       }
@@ -175,7 +141,7 @@ const App = () => {
     return reverse ? 1 - normalized : normalized;
   };
 
-  const calculateScore = (products: Product[]): any[] => {
+  const calculateScore = (products: any[]): any[] => {
     if (products.length === 0) return [];
 
     const category = products[0].category;
@@ -225,7 +191,7 @@ const App = () => {
     }).sort((a, b) => b.totalScore - a.totalScore);
   };
 
-  const addToComparison = (product: Product) => {
+  const addToComparison = (product: any) => {
     if (selectedProducts.length >= 4) return;
     
     if (selectedProducts.length > 0 && selectedProducts[0].category !== product.category) {
@@ -369,121 +335,6 @@ const App = () => {
     if (spec === 'Screen Size (inch)') return `${value}"`;
     if (spec === 'Front-Facing Camera MP' || spec === 'Rear-Facing Camera MP') return `${value} MP`;
     return value?.toString() || 'N/A';
-  };
-
-  const getCategoryDisplayName = (category: string): string => {
-    const names: Record<string, string> = {
-      smartphones: 'Smartphones',
-      laptops: 'Laptops',
-      home_appliances: 'Home Appliances',
-      airpod: 'Airpods',
-    };
-    return names[category] || category;
-  };
-
-  const getProgressBarColor = (score: number): string => {
-    if (score >= 0.7) return '#00ADB5'; // Teal for best
-    if (score >= 0.4) return '#FFCC00'; // Yellow for middle
-    return '#FF6B6B'; // Red for worst
-  };
-
-  // Helper for rank badge color
-  const getRankBadgeColor = (rank: number) => {
-    if (rank === 1) return 'bg-warning text-warning-foreground';
-    return 'bg-muted text-muted-foreground';
-  };
-
-  // Add a useEffect to stop all video streams when showQrModal closes
-  useEffect(() => {
-    if (!showQrModal) {
-      // Stop and remove all video elements
-      const stopAndRemoveVideos = () => {
-        const videos = document.querySelectorAll('video');
-        videos.forEach(video => {
-          if (video.srcObject) {
-            try {
-              const tracks = (video.srcObject as MediaStream).getTracks();
-              tracks.forEach(track => track.stop());
-            } catch {}
-            video.srcObject = null;
-          }
-          if (video.parentNode) {
-            video.parentNode.removeChild(video);
-          }
-        });
-      };
-      stopAndRemoveVideos();
-      // Failsafe: try again after 500ms in case video is re-added by library
-      setTimeout(stopAndRemoveVideos, 500);
-      // Try to stop all active media streams from navigator (extra failsafe)
-      if (navigator.mediaDevices && 'getUserMedia' in navigator.mediaDevices) {
-        if ((navigator as any)._mediaStream) {
-          try {
-            (navigator as any)._mediaStream.getTracks().forEach((track: MediaStreamTrack) => track.stop());
-          } catch {}
-        }
-      }
-    }
-  }, [showQrModal]);
-
-  // Add this effect to set the video id when the modal is open
-  useEffect(() => {
-    if (showQrModal) {
-      const interval = setInterval(() => {
-        const video = document.querySelector('video');
-        if (video && !video.id) {
-          video.id = 'qr-video';
-          clearInterval(interval);
-        }
-      }, 100);
-      return () => clearInterval(interval);
-    }
-  }, [showQrModal]);
-
-  // Helper to stop all video streams
-  const stopAllVideoStreams = () => {
-    const video = document.getElementById('qr-video') as HTMLVideoElement | null;
-    if (video && video.srcObject) {
-      const tracks = (video.srcObject as MediaStream).getTracks();
-      tracks.forEach(track => track.stop());
-      video.srcObject = null;
-    }
-  };
-
-  // Refactor QR scan handler to always check current selectedProducts and products
-  const addProductByIdWithCategoryCheck = async (productId: string) => {
-    // Try local cache first
-    let product = products.find(p => p.id === productId);
-    if (!product) {
-      // Fetch from Firestore if not in local cache
-      const docSnap = await getDoc(doc(db, 'products', productId));
-      if (docSnap.exists()) product = docSnap.data();
-    }
-    if (!product) {
-      setToast({ type: 'error', message: 'Product not found.' });
-      return;
-    }
-    // Always use latest selectedProducts
-    setSelectedProducts(prev => {
-      // If already present, do nothing
-      if (prev.find(p => p.id === product.id)) {
-        setToast({ type: 'info', message: 'Product already in comparison list.' });
-        return prev;
-      }
-      // If category mismatch, show error
-      if (prev.length > 0 && prev[0].category !== product.category) {
-        setCategoryError('Category does not match. Please clear your comparison list first.');
-        return prev;
-      }
-      setToast({ type: 'success', message: 'Product added for comparison!' });
-      return [...prev, product];
-    });
-  };
-
-  const handleCloseQrModal = () => {
-    stopAllVideoStreams();
-    setShowQrModal(false);
-    setQrKey(Date.now());
   };
 
   // Helper to truncate strings
@@ -928,7 +779,7 @@ const App = () => {
                     {comparisonResults.map((result, idx) => (
                       <th key={result.product.id} className="text-center py-2 px-4 border-b-2 border-border bg-muted">
                         <div className="flex flex-col items-center gap-1">
-                          <span className={`inline-block px-3 py-1 rounded-full text-xs font-bold mb-1 ${getRankBadgeColor(idx+1)}`}>Rank {idx+1}</span>
+                          <span className="inline-block px-3 py-1 rounded-full text-xs font-bold mb-1 bg-muted text-muted-foreground">Rank {idx+1}</span>
                           <div className="w-12 h-12 bg-accent rounded-lg flex items-center justify-center overflow-hidden mb-1">
                             {result.product.image ? (
                               <img src={result.product.image} alt={result.product.name} className="w-full h-full object-contain" />
@@ -1111,19 +962,19 @@ const App = () => {
             console.log('Final productId used:', productId);
             let product = products.find(p => p.id === productId);
             if (!product) {
-              setToast({ type: 'error', message: 'Product not found.' });
+              // Optionally, show error to user: Product not found.
               return;
             }
             setSelectedProducts(prev => {
               if (prev.find(p => p.id === product.id)) {
-                setToast({ type: 'info', message: 'Product already in comparison list.' });
+                // Optionally, show info to user: Product already in comparison list.
                 return prev;
               }
               if (prev.length > 0 && prev[0].category !== product.category) {
                 setCategoryError('Category does not match. Please clear your comparison list first.');
                 return prev;
               }
-              setToast({ type: 'success', message: 'Product added for comparison!' });
+              // Optionally, show success to user: Product added for comparison!
               return [...prev, product];
             });
           }}
