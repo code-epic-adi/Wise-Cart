@@ -84,8 +84,8 @@ const QrScannerModal: React.FC<QrScannerModalProps> = ({ open, onClose, onScan }
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70">
-      <div className="bg-card p-6 rounded-xl shadow-lg relative w-[350px] max-w-full">
+    <div className="fixed bottom-6 right-6 z-50 flex items-end justify-end">
+      <div className="bg-card p-6 rounded-xl shadow-lg relative w-[350px] max-w-full border border-accent">
         <button
           className="absolute top-2 right-2 text-xl"
           onClick={onClose}
