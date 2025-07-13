@@ -1,105 +1,66 @@
-# Firestore Database Integration
+# Wise Cart
 
-This project demonstrates how to connect a web application to Firebase Firestore database.
+![Walmart Sparkathon](https://freshershunt.in/wp-content/uploads/2024/08/Walmart-Sparkathon.png)
 
-## Prerequisites
+**Wise Cart** is a modern, responsive web application built as an entry for the **Walmart Sparkathon**. It empowers Walmart customers to discover, compare, and buy products with confidence—whether in-store or online—using advanced comparison logic, QR code integration, and a seamless, mobile-friendly experience.
 
-- A Google account
-- Basic knowledge of HTML, CSS, and JavaScript
+## 🚀 Sparkathon Pitch
+> **"Shop Smarter at Walmart with Wise Cart!"**
+>
+> Wise Cart helps Walmart shoppers make informed decisions by comparing features, specs, and prices across categories. Scan QR codes in-store or online, instantly compare up to 4 products, and buy with one click. Personalized weights, best spec highlighting, and direct buy links make this the ultimate Walmart shopping companion.
 
-## Step 1: Create a Firebase Project
+## Features
+- 🔍 **Walmart Product Search & Filtering**
+- 📊 **Side-by-side Product Comparison**
+- 🏆 **Smart Scoring & Best Spec Highlighting**
+- 🌗 **Dark/Light Mode Support**
+- 📱 **Mobile-friendly, Responsive UI**
+- 📦 **QR Code Integration for Walmart Product URLs**
+- 🛒 **Buy Button for Direct Walmart Purchase**
+- 🧠 **Custom Weights for Personalized Comparison**
+- ⚡ **Firestore Data Caching**
+- 🛠️ **Robust Error Handling & User Feedback**
 
-1. Go to the [Firebase Console](https://console.firebase.google.com/)
-2. Click "Create a project" or "Add project"
-3. Enter a project name (e.g., "my-firestore-demo")
-4. Choose whether to enable Google Analytics (optional)
-5. Click "Create project"
+## Tech Stack
+- **Frontend:** React, TypeScript, Tailwind CSS
+- **Backend:** Firebase Firestore
+- **QR Code:** @zxing/browser
 
-## Step 2: Enable Firestore Database
+## Getting Started
 
-1. In your Firebase project console, click on "Firestore Database" in the left sidebar
-2. Click "Create database"
-3. Choose "Start in test mode" (for development - you can add security rules later)
-4. Select a location for your database (choose the closest to your users)
-5. Click "Done"
+1. **Clone the repository:**
+   ```sh
+   git clone https://github.com/code-epic-adi/Product-Comparator.git
+   cd Product-Comparator
+   ```
+2. **Install dependencies:**
+   ```sh
+   npm install
+   ```
+3. **Set up Firebase:**
+   - Create a Firebase project and Firestore database.
+   - Add your Firebase config to a `.env` file (see `.env.example`).
+4. **Run the app:**
+   ```sh
+   npm run dev
+   ```
+5. **Build for production:**
+   ```sh
+   npm run build
+   ```
 
-## Step 3: Get Your Firebase Configuration
+## Usage at Walmart
+- **Scan QR codes** on Walmart shelves or product pages to instantly add items for comparison.
+- **Compare up to 4 products** side-by-side, with best specs highlighted for quick decision-making.
+- **Personalize your comparison** by adjusting feature weights to match your shopping priorities.
+- **Click the Buy button** to purchase directly from Walmart.
+- **Works great on mobile**—perfect for in-store use!
 
-1. In the Firebase console, click the gear icon (⚙️) next to "Project Overview"
-2. Select "Project settings"
-3. Scroll down to "Your apps" section
-4. Click the web icon (</>) to add a web app
-5. Register your app with a nickname (e.g., "my-web-app")
-6. Copy the Firebase configuration object
+## Credits & Collaborators
 
-## Step 4: Update Your Code
+- [@AdityaOnam](https://github.com/AdityaOnam)
+- [@himwim](https://github.com/himwim/)
 
-Replace the `firebaseConfig` object in your `index.html` file with your actual configuration:
+---
 
-```javascript
-const firebaseConfig = {
-  apiKey: "your-actual-api-key",
-  authDomain: "your-project-id.firebaseapp.com",
-  projectId: "your-project-id",
-  storageBucket: "your-project-id.appspot.com",
-  messagingSenderId: "your-messaging-sender-id",
-  appId: "your-app-id"
-};
-```
-
-## Step 5: Test Your Application
-
-1. Open `index.html` in a web browser
-2. Try adding a new document using the form
-3. Click "Load Documents" to see your data
-4. Check the Firebase console to see your data in the Firestore database
-
-## Features Included
-
-- **Add Documents**: Create new documents in the "users" collection
-- **Read Documents**: Load and display all documents from the collection
-- **Delete Documents**: Remove documents from the database
-- **Real-time Updates**: Data is automatically refreshed after operations
-
-## Security Rules
-
-For production, you should set up proper Firestore security rules. Here's a basic example:
-
-```javascript
-rules_version = '2';
-service cloud.firestore {
-  match /databases/{database}/documents {
-    match /{document=**} {
-      allow read, write: if request.auth != null;
-    }
-  }
-}
-```
-
-## Common Issues and Solutions
-
-### 1. "Firebase App named '[DEFAULT]' already exists"
-- This happens if you initialize Firebase multiple times
-- Solution: Make sure you only call `initializeApp()` once
-
-### 2. "Missing or insufficient permissions"
-- This happens when Firestore security rules are too restrictive
-- Solution: Check your Firestore rules in the Firebase console
-
-### 3. "Network error"
-- This can happen if your API key is incorrect
-- Solution: Double-check your Firebase configuration
-
-## Next Steps
-
-- Add authentication to secure your data
-- Implement real-time listeners for live updates
-- Add data validation and error handling
-- Create more complex queries and filters
-- Add offline support with Firebase persistence
-
-## Resources
-
-- [Firebase Documentation](https://firebase.google.com/docs)
-- [Firestore Documentation](https://firebase.google.com/docs/firestore)
-- [Firebase JavaScript SDK](https://firebase.google.com/docs/web/setup) 
+> Made with ❤️ for Walmart Sparkathon by the Wise Cart team. 
