@@ -1,6 +1,5 @@
 import React, { useEffect, useRef } from 'react';
 import { BrowserMultiFormatReader } from '@zxing/browser';
-import { NotFoundException } from '@zxing/library';
 
 interface QrScannerModalProps {
   open: boolean;
@@ -58,7 +57,7 @@ const QrScannerModal: React.FC<QrScannerModalProps> = ({ open, onClose, onScan }
         codeReaderRef.current.decodeFromStream(
           stream,
           videoRef.current!,
-          (result, err) => {
+          (result) => {
             if (!scanActiveRef.current) return;
             if (result) {
               scanActiveRef.current = false;

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
-import { Search, Plus, X, Trophy, Filter, ShoppingCart, Sun, Moon, QrCode } from 'lucide-react';
+import { Search, Plus, X, Filter, Sun, Moon, QrCode } from 'lucide-react';
 import { db } from './firebase';
 import { collection, getDocs, doc, getDoc } from 'firebase/firestore';
 import QrScannerModal from './QrScannerModal';
